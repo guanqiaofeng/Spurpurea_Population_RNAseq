@@ -52,7 +52,9 @@ Annotation: GTF/GFF3
 STAR --runMode genomeGenerate --genomeDir /path/to/genome/directory/ --genomeFastaFiles /path/to/genome.fa --sjdbGTFfile path/to/annotation.gtf --runThreadN <number-of-threads>
 ```
 \* Make sure genome sequence and reference sequence has the same name for chromosomes
+
 \* For --sjdbGTFfile, STAR only process lines which has "exon" in the third column
+
 \* Size of N-mers by default is 14
 
 ### Step 2. Mapping Reads to Genome
