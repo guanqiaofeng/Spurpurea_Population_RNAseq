@@ -49,7 +49,7 @@ Annotation: GTF/GFF3
 ## Methods
 ### Step 1. Genrating Genome indices
 ```sh
-STAR --runMode genomeGenerate --genomeDir /path/to/genome/directory/ --genomeFastaFiles /path/to/genome.fa --sjdbGTFfile path/to/annotation.gtf --runThreadN <number-of-threads>
+STAR --runMode genomeGenerate --genomeDir /path/to/genome/directory/ --genomeFastaFiles /path/to/genome.fa --sjdbGTFfile path/to/annotation.gtf --runThreadN <number-of-threads/12>
 ```
 \* Make sure genome sequence and reference sequence has the same name for chromosomes
 
@@ -58,3 +58,6 @@ STAR --runMode genomeGenerate --genomeDir /path/to/genome/directory/ --genomeFas
 \* Size of N-mers by default is 14
 
 ### Step 2. Mapping Reads to Genome
+```sh
+STAR --genomeDir /path/to/genome/directory/ --sjdbGTFfile /path/to/annotations.gtf --readFileIn path/to/read1.fastq path/to/read2.fastq --outSAMtype BAM SortedByCoordinate --outSAMattributes ALL --runThreadN <number-of-threads/12>
+```
