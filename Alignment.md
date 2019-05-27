@@ -8,6 +8,9 @@ http://www.novocraft.com/documentation/novoalign-2/novoalign-user-guide/getting-
 **STAR**
 https://github.com/alexdobin/STAR
 
+**STAR-fusion**
+https://github.com/STAR-Fusion/STAR-Fusion/wiki
+
 **GSNAP**
 https://github.com/juliangehring/GMAP-GSNAP
 
@@ -18,4 +21,11 @@ https://github.com/juliangehring/GMAP-GSNAP
 
 To summarize, **STAR** would be the best option for me, as it has good base-level and junction-level calling and short runtime. And I will need to tune parameters to achieve the best performance. 
 
-## Getting started
+## Getting started with STAR (Spliced Transcripts Alignment to a Reference)
+
+Dobin A, Davis CA, Schlesinger F, Drenkow J, Zaleski C, Jha S, Batut P, Chaisson M, Gingeras TR (2013) STAR: ultrafast universal RNA-seq aligner. Bioinformatics 29: 15-21
+
+Dobin A & Gingeras TR (2016). Optimizing RNA-Seq mapping with STAR. In Data Mining Techniques for the Life Sciences (pp. 245-262). Humana Press, New York, NY.
+
+STAR can detect annotated and novel splice junctions, as well as chimeric and circular RNA. STAR-Fusion can detect fusion transcript. STAR take fastq files as input and output standard SAM/BAM files, as well as various other data files useful for downstream analyses such as transcript/gene expression quantification, differential gene expression, novel isoform reconstruction, signal visualization, etc. 
+
