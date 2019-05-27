@@ -59,5 +59,5 @@ STAR --runMode genomeGenerate --genomeDir /path/to/genome/directory/ --genomeFas
 
 ### Step 2. Mapping Reads to Genome
 ```sh
-STAR --genomeDir /path/to/genome/directory/ --sjdbGTFfile /path/to/annotations.gtf --readFileIn path/to/read1.fastq path/to/read2.fastq --outSAMtype BAM SortedByCoordinate --outSAMattributes ALL --runThreadN <number-of-threads/12>
+STAR --genomeDir /path/to/genome/directory/ --sjdbGTFfile /path/to/annotations.gtf --readFileIn path/to/read1.fastq path/to/read2.fastq --outSAMtype BAM SortedByCoordinate --outSAMattributes ALL --outStd BAM_SortedByCoordinate --outTmp-Dir /path/to/tmp/dir/ --runThreadN <number-of-threads/12>
 ```
