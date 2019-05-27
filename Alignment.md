@@ -3,6 +3,7 @@
 Based on paper "Simulation-based comprehensive benchmarking of RNA-seq aligners", to me, Novoalign, STAR and GSNAP are the best options.
 
 Document for 
+
 **Novoalign**
 http://www.novocraft.com/documentation/novoalign-2/novoalign-user-guide/getting-started/
 
