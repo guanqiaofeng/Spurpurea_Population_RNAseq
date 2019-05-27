@@ -1,8 +1,6 @@
 # Find the best aligner
 
-Based on paper "Simulation-based comprehensive benchmarking of RNA-seq aligners", to me, Novoalign, STAR and GSNAP are the best options.
-
-Document for 
+Based on paper "Simulation-based comprehensive benchmarking of RNA-seq aligners", to me, Novoalign, STAR and GSNAP are the best options. 
 
 **Novoalign**
 http://www.novocraft.com/documentation/novoalign-2/novoalign-user-guide/getting-started/
