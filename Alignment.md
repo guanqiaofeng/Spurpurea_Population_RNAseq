@@ -50,10 +50,10 @@ Annotation: GTF/GFF3
 ### Step 1. Genrating Genome indices
 ```sh
 STAR --runMode genomeGenerate \
---genomeDir /path/to/genome/directory/ \
---genomeFastaFiles /path/to/genome.fa \
---sjdbGTFfile path/to/annotation.gtf \
---runThreadN <number-of-threads/12>
+     --genomeDir /path/to/genome/directory/ \
+     --genomeFastaFiles /path/to/genome.fa \
+     --sjdbGTFfile path/to/annotation.gtf \
+     --runThreadN <number-of-threads/12>
 ```
 \* Make sure genome sequence and reference sequence has the same name for chromosomes
 
