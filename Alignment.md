@@ -21,7 +21,7 @@ https://github.com/juliangehring/GMAP-GSNAP
 
 To summarize, **STAR** would be the best option for me, as it has good base-level and junction-level calling and short runtime. And I will need to tune parameters to achieve the best performance. 
 
-## Getting started with STAR (Spliced Transcripts Alignment to a Reference)
+# Getting started with STAR (Spliced Transcripts Alignment to a Reference)
 
 Dobin A, Davis CA, Schlesinger F, Drenkow J, Zaleski C, Jha S, Batut P, Chaisson M, Gingeras TR (2013) STAR: ultrafast universal RNA-seq aligner. Bioinformatics 29: 15-21
 
@@ -29,3 +29,16 @@ Dobin A & Gingeras TR (2016). Optimizing RNA-Seq mapping with STAR. In Data Mini
 
 STAR can detect annotated and novel splice junctions, as well as chimeric and circular RNA. STAR-Fusion can detect fusion transcript. STAR take fastq files as input and output standard SAM/BAM files, as well as various other data files useful for downstream analyses such as transcript/gene expression quantification, differential gene expression, novel isoform reconstruction, signal visualization, etc. 
 
+## 1. Materials
+### 1.1 Hardware
+System: 64-bit Unix, Linux, or Mac OS X
+Maximun RAM: ~10 x GenomeSize bytes. For S. purpurea, ~5GB
+Disk space: > 100GB recommended
+Multithreaded: Yes --runThreadN <number-of-threads>. Typically, this number should be equal to the number of processor cores
+
+### 1.2 Software
+Download: https://github.com/alexdobin/STAR/releases
+Discussion: https://groups.google.com/forum/#!forum/rna-star
+Manual: https://github.com/alexdobin/ STAR /raw/master/doc/STARmanual.pdf
+
+### 1.3 
