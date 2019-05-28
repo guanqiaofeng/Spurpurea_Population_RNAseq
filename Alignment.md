@@ -62,10 +62,12 @@ STAR --runMode genomeGenerate \
 \* Size of N-mers by default is 14
 
 ### Step 2. Mapping Reads to Genome
+Multi-sample 2-Pass Mapping. The 1st pass serves to detect novel junctions, and in the 2nd pass, the detected junctions are added to the annotated junctions and all reads are re-mapped to finalize the alignment. It substantially increases the number of reads crossing the novel junctions, by allowing novel splices with shorter overhang. It adds sensitivity to unannotated splices. 
+#### Step 2.1. Run 1st mapping pass for all samples with normal parameters.
 ```sh
 STAR --genomeDir /path/to/genome/directory/ \
      --sjdbGTFfile /path/to/annotations.gtf \
-     --readFileIn path/to/read1.fastq path/to/read2.fastq \
+     --readFileIn path/to/readA1.fastq,path/to/readB1.fastq,path/to/readC1.fastq... path/to/readA2.fastq,path/to/readB2.fastq,path/to/readC2.fastq... \
      --outFilterMismatchNoverReadLmax 0.05 \ # protion of mismatch allowed for the mapped reads
      --outFilterMultimapNmax 5 \ # allow mutimapping to maximum 5 loci
      --alignIntronMin <Number> \ # calcualte from the annotation of minimum intron size and use it as a guide for this parameter
@@ -73,9 +75,35 @@ STAR --genomeDir /path/to/genome/directory/ \
      --alignMatesGapMax 1000000 \ # maximum genomic distance between mates, need to be larger than --alignIntronMax
      --alignSJoverhangMin 8 \ # minimum overhang for unannotated junctions
      --alignSJDBoverhangMin 1 \ # minimum overhang for annotated junctions
+     --outSJfilterOverhangMin 30 12 12 12 \ # at least one supporting read has a large enough overhang >= 15 for noncanonical and 8 for unannotated canonical motifs, default was 30 12 12 12
+     --outFilterType BySJout \ # reduce the number of "spurious" junctions
+     --outSAMtype SAM Unsorted \
+     --outSAMattributes NONE \
+     --outTmp-Dir /path/to/tmp/dir/ \
+     --outFileNamePrefix /path/to/output/prefix/ \
+     --runThreadN <number-of-threads/12> \
+     --genomeLoad LoadAndRemove # genome will be removed from the shared memory once all STAR jobs using it exit
+```
+
+#### Step 2.2. Run 2nd mapping pass for all samples, list SJ.out.tab files from all samples in 
+```sh
+STAR --genomeDir /path/to/genome/directory/ \
+     --sjdbGTFfile /path/to/annotations.gtf \
+     --sjdbFileChrStartEnd /path/to/sample1/SJ.out.tab /path/to/sample2/SJ.out.tab ...
+     --readFileIn path/to/readA1.fastq,path/to/readB1.fastq,path/to/readC1.fastq,... path/to/readA2.fastq,path/to/readB2.fastq,path/to/readC2.fastq,... \
+     --outFilterMismatchNoverReadLmax 0.05 \ # protion of mismatch allowed for the mapped reads
+     --outFilterMultimapNmax 5 \ # allow mutimapping to maximum 5 loci
+     --alignIntronMin <Number> \ # calcualte from the annotation of minimum intron size and use it as a guide for this parameter
+     --alignIntronMax <Number> \ # calcualte from the annotation of maximum intron size and use it as a guide for this parameter
+     --alignMatesGapMax 1000000 \ # maximum genomic distance between mates, need to be larger than --alignIntronMax
+     --alignSJoverhangMin 8 \ # minimum overhang for unannotated junctions
+     --alignSJDBoverhangMin 1 \ # minimum overhang for annotated junctions
+     --outSJfilterOverhangMin 30 12 12 12 \ # at least one supporting read has a large enough overhang >= 15 for noncanonical and 8 for unannotated canonical motifs, default was 30 12 12 12
+     --outFilterType BySJout \ # reduce the number of "spurious" junctions
      --outSAMtype BAM SortedByCoordinate \
      --outSAMattributes ALL \
-     --outStd BAM_SortedByCoordinate \
      --outTmp-Dir /path/to/tmp/dir/ \ 
-     --runThreadN <number-of-threads/12>
+     --outFileNamePrefix /path/to/output/prefix/ \
+     --runThreadN <number-of-threads/12> \
+     --genomeLoad LoadAndRemove # genome will be removed from the shared memory once all STAR jobs using it exit
 ```
