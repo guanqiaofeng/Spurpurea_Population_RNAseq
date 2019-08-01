@@ -75,7 +75,6 @@ STAR --genomeDir /path/to/genome/directory/ \
      --outFilterMultimapNmax 5 \ # allow mutimapping to maximum 5 loci
      --alignIntronMin 19 \ # minimum intron length in S. purpurea annotation is 20
      --alignIntronMax 17000 \ # maximum intron length in S. purpurea annotation is 16653
-     --alignMatesGapMax 1000000 \ # maximum genomic distance between mates, need to be larger than --alignIntronMax
      --alignSJoverhangMin 8 \ # minimum overhang for unannotated junctions
      --alignSJDBoverhangMin 1 \ # minimum overhang for annotated junctions
      --outSJfilterOverhangMin 30 12 12 12 \ # at least one supporting read has a large enough overhang >= 15 for noncanonical and 8 for unannotated canonical motifs, default was 30 12 12 12
