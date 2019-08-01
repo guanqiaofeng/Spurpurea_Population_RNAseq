@@ -53,6 +53,8 @@ STAR --runMode genomeGenerate \
      --genomeDir /path/to/genome/directory/ \
      --genomeFastaFiles /path/to/genome.fa \
      --sjdbGTFfile path/to/annotation.gtf \
+     --sjdbGTFtagExonParentTranscript Parent \
+     --sjdbOverhang 149 \
      --runThreadN <number-of-threads/12>
 ```
 \* Make sure genome sequence and reference sequence has the same name for chromosomes
