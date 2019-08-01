@@ -73,7 +73,7 @@ STAR --genomeDir /path/to/genome/directory/ \
      --readFileIn path/to/readA1.fastq,path/to/readB1.fastq,path/to/readC1.fastq... path/to/readA2.fastq,path/to/readB2.fastq,path/to/readC2.fastq... \
      --outFilterMismatchNoverReadLmax 0.05 \ # protion of mismatch allowed for the mapped reads
      --outFilterMultimapNmax 5 \ # allow mutimapping to maximum 5 loci
-     --alignIntronMin 20 \ # minimum intron length in S. purpurea annotation is 20
+     --alignIntronMin 19 \ # minimum intron length in S. purpurea annotation is 20
      --alignIntronMax 17000 \ # maximum intron length in S. purpurea annotation is 16653
      --alignMatesGapMax 1000000 \ # maximum genomic distance between mates, need to be larger than --alignIntronMax
      --alignSJoverhangMin 8 \ # minimum overhang for unannotated junctions
