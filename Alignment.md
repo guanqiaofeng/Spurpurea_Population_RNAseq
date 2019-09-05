@@ -49,14 +49,23 @@ Annotation: GTF/GFF3
 ## Methods
 ### Step 1. Genrating Genome indices
 ```sh
+#!/bin/sh
+#$ -V
+#$ -cwd
+#$ -S /bin/bash
+#$ -N star_genome
+#$ -q omni
+#$ -pe sm 6
+#$ -P quanah
+
 STAR --runMode genomeGenerate \
-     --genomeDir /path/to/genome/directory/ \
-     --genomeFastaFiles /path/to/genome.fa \
-     --sjdbGTFfile path/to/annotation.gtf \
+     --genomeDir /lustre/scratch/gufeng/genome/Spur/187Zspecific/ \
+     --genomeFastaFiles /lustre/scratch/gufeng/genome/Spur/187Zspecific/Spurpurea_519_v5.0_187Zspecific.fa \
+     --sjdbGTFfile /lustre/scratch/gufeng/genome/Spur/187Zspecific/Spurpurea_519_v5.1.gene_exons_187Zspecific.gff3 \
      --sjdbGTFtagExonParentTranscript Parent \
      --sjdbOverhang 149 \
      --genomeSAindexNbases 13 \
-     --runThreadN <number-of-threads/12>
+     --runThreadN 6
 ```
 \* Make sure genome sequence and reference sequence has the same name for chromosomes
 
@@ -64,48 +73,99 @@ STAR --runMode genomeGenerate \
 
 \* Size of N-mers by default is 14
 
-### Step 2. Mapping Reads to Genome
+### Step 2. Mapping Reads to Genome (1st pass)
 Multi-sample 2-Pass Mapping. The 1st pass serves to detect novel junctions, and in the 2nd pass, the detected junctions are added to the annotated junctions and all reads are re-mapped to finalize the alignment. It substantially increases the number of reads crossing the novel junctions, by allowing novel splices with shorter overhang. It adds sensitivity to unannotated splices. 
-#### Step 2.1. Run 1st mapping pass for all samples with normal parameters.
+
+Run 1st mapping pass for all samples with for loop.
 ```sh
-STAR --genomeDir /path/to/genome/directory/ \
-     --sjdbGTFfile /path/to/annotations.gtf \
-     --readFileIn path/to/readA1.fastq,path/to/readB1.fastq,path/to/readC1.fastq... path/to/readA2.fastq,path/to/readB2.fastq,path/to/readC2.fastq... \
-     --outFilterMismatchNoverReadLmax 0.05 \ # protion of mismatch allowed for the mapped reads
-     --outFilterMultimapNmax 5 \ # allow mutimapping to maximum 5 loci
-     --alignIntronMin 19 \ # minimum intron length in S. purpurea annotation is 20
-     --alignIntronMax 17000 \ # maximum intron length in S. purpurea annotation is 16653
-     #--alignSJoverhangMin 8 \ # minimum overhang for unannotated junctions
-     #--alignSJDBoverhangMin 1 \ # minimum overhang for annotated junctions
-     #--outSJfilterOverhangMin 30 12 12 12 \ # at least one supporting read has a large enough overhang >= 15 for noncanonical and 8 for unannotated canonical motifs, default was 30 12 12 12
-     --outFilterType BySJout \ # reduce the number of "spurious" junctions
-     --outSAMtype SAM Unsorted \
-     --outSAMattributes NONE \
-     --outTmp-Dir /path/to/tmp/dir/ \
-     --outFileNamePrefix /path/to/output/prefix/ \
-     --runThreadN <number-of-threads/12> \
-     --genomeLoad LoadAndRemove # genome will be removed from the shared memory once all STAR jobs using it exit
+#!/bin/bash
+
+for i in {1..92..1}
+do
+    qsub star1_M$i.sh
+done
+```
+example code
+```sh
+#!/bin/sh
+#$ -V
+#$ -cwd
+#$ -S /bin/bash
+#$ -N F1
+#$ -q omni
+#$ -pe sm 8
+#$ -P quanah
+
+STAR --genomeDir /lustre/scratch/gufeng/genome/Spur/187Zspecific/ \
+     --sjdbGTFfile /lustre/scratch/gufeng/genome/Spur/187Zspecific/Spurpurea_519_v5.1.gene_exons_187Zspecific.gff3 \
+     --readFilesIn /lustre/scratch/gufeng/S_purpurea_RNA_seq/QC_Filtered_Raw_Data_process_split/10262.1.154566.ATTACTC-ATAGAGG_1.anqrpht.fastq /lustre/scratch/gufeng/S_purpurea_RNA_seq/QC_Filtered_Raw_Data_process_split/10262.1.154566.ATTACTC-ATAGAGG_2.anqrpht.fastq \
+     --outFileNamePrefix F1. \
+     --outFilterMismatchNoverReadLmax 0.05 \
+     --outFilterMultimapNmax 5 \
+     --alignIntronMin 19 \
+     --alignIntronMax 20000 \
+     --runThreadN 8
+
+# minimum intron length in S. purpurea annotation is 20, maximum intron length in S. purpurea annotation is 16653
+```
+ Collapse the junctions (cat), remove non-canonical junctions ($5>0), remove junctions exists in less than two samples ($7>2), remove annotated junctions ($6==0). remove the duplicate ones after filtering (uniq)
+```sh
+cat *.tab | awk '($5 > 0 && $7 > 2 && $6==0)' | cut -f1-6 | sort | uniq > SJ.filtered.tab
+```
+### Step 3. Genrating Genome indices with the new junctions
+```sh
+#!/bin/sh
+#$ -V
+#$ -cwd
+#$ -S /bin/bash
+#$ -N star_genome
+#$ -q omni
+#$ -pe sm 6
+#$ -P quanah
+
+
+STAR --runMode genomeGenerate \
+     --genomeDir /lustre/scratch/gufeng/genome/Spur/187Zspecific/SJ_Index/ \
+     --genomeFastaFiles /lustre/scratch/gufeng/genome/Spur/187Zspecific/SJ_Index/Spurpurea_519_v5.0_187Zspecific.fa \
+     --sjdbGTFfile /lustre/scratch/gufeng/genome/Spur/187Zspecific/SJ_Index/Spurpurea_519_v5.1.gene_exons_187Zspecific.gff3 \
+     --sjdbGTFtagExonParentTranscript Parent \
+     --sjdbOverhang 149 \
+     --genomeSAindexNbases 13 \
+     --sjdbFileChrStartEnd SJ.filtered.tab \
+     --runThreadN 6
 ```
 
-#### Step 2.2. Run 2nd mapping pass for all samples, list SJ.out.tab files from all samples in 
+### Step 4. Mapping Reads to Genome (2nd pass)
+Run 2nd mapping pass for all samples with for loop.
 ```sh
-STAR --genomeDir /path/to/genome/directory/ \
-     --sjdbGTFfile /path/to/annotations.gtf \
-     --sjdbFileChrStartEnd /path/to/sample1/SJ.out.tab /path/to/sample2/SJ.out.tab ...
-     --readFileIn path/to/readA1.fastq,path/to/readB1.fastq,path/to/readC1.fastq,... path/to/readA2.fastq,path/to/readB2.fastq,path/to/readC2.fastq,... \
-     --outFilterMismatchNoverReadLmax 0.05 \ # protion of mismatch allowed for the mapped reads
-     --outFilterMultimapNmax 5 \ # allow mutimapping to maximum 5 loci
-     --alignIntronMin <Number> \ # calcualte from the annotation of minimum intron size and use it as a guide for this parameter
-     --alignIntronMax <Number> \ # calcualte from the annotation of maximum intron size and use it as a guide for this parameter
-     --alignMatesGapMax 1000000 \ # maximum genomic distance between mates, need to be larger than --alignIntronMax
-     --alignSJoverhangMin 8 \ # minimum overhang for unannotated junctions
-     --alignSJDBoverhangMin 1 \ # minimum overhang for annotated junctions
-     --outSJfilterOverhangMin 30 12 12 12 \ # at least one supporting read has a large enough overhang >= 15 for noncanonical and 8 for unannotated canonical motifs, default was 30 12 12 12
-     --outFilterType BySJout \ # reduce the number of "spurious" junctions
-     --outSAMtype BAM SortedByCoordinate \
-     --outSAMattributes ALL \
-     --outTmp-Dir /path/to/tmp/dir/ \ 
-     --outFileNamePrefix /path/to/output/prefix/ \
-     --runThreadN <number-of-threads/12> \
-     --genomeLoad LoadAndRemove # genome will be removed from the shared memory once all STAR jobs using it exit
+#!/bin/bash
+
+for i in {1..90..1}
+do
+    qsub star1_F$i.sh
+done
+```
+example code
+```sh
+#!/bin/sh
+#$ -V
+#$ -cwd
+#$ -S /bin/bash
+#$ -N M92
+#$ -q omni
+#$ -pe sm 8
+#$ -P quanah
+
+STAR --genomeDir /lustre/scratch/gufeng/genome/Spur/187Zspecific/SJ_Index/ \
+     --sjdbGTFfile /lustre/scratch/gufeng/genome/Spur/187Zspecific/SJ_Index/Spurpurea_519_v5.1.gene_exons_187Zspecific.gff3 \
+     --readFilesIn /lustre/scratch/gufeng/S_purpurea_RNA_seq/QC_Filtered_Raw_Data_process_split/11801.1.220153.ATAGCGG-ACCGCTA_1.anqrpht.fastq,/lustre/scratch/gufeng/S_purpurea_RNA_seq/QC_Filtered_Raw_Data_process_split/11801.1.220153.CCTCAGT-AACTGAG_1.anqrpht.fastq,/lustre/scratch/gufeng/S_purpurea_RNA_seq/QC_Filtered_Raw_Data_process_split/11801.3.220165.GAGCTCA-TTGAGCT_1.anqrpht.fastq /lustre/scratch/gufeng/S_purpurea_RNA_seq/QC_Filtered_Raw_Data_process_split/11801.1.220153.ATAGCGG-A
+CCGCTA_2.anqrpht.fastq,/lustre/scratch/gufeng/S_purpurea_RNA_seq/QC_Filtered_Raw_Data_process_split/11801.1.220153.CCTCAGT-AACTGAG_2.anqrpht.fastq,/lustre/scratch/gufeng/S_purpurea_RNA_seq/QC_Filtered_Raw_Data_process_split/11801.3.220165.GAGCTCA-TTGAGCT_2.anqrpht.fastq \
+     --outFileNamePrefix M92. \
+     --outFilterMismatchNoverReadLmax 0.05 \
+     --outFilterMultimapNmax 5 \
+     --alignIntronMin 19 \
+     --alignIntronMax 20000 \
+     --outSAMtype BAM Unsorted \
+     --runThreadN 8
+
 ```
