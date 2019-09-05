@@ -46,6 +46,9 @@ RNA-seq: FASTQ/FASTA
 Reference genome: FASTA
 Annotation: GTF/GFF3
 
+## Guidance for multi-sample 2-pass mapping
+https://groups.google.com/forum/#!topic/rna-star/Cpsf-_rLK9I
+
 ## Methods
 ### Step 1. Genrating Genome indices
 ```sh
