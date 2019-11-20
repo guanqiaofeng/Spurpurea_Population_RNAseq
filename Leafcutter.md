@@ -238,6 +238,7 @@ code used (provided by LeafCutter): scripts/ds_plots.R
 ## Step5. Visualization
 
 1. prepare annotation files (working directory /lustre/scratch/gufeng/genome/Spur/187Zspecific/leafcutter_bed/new/)
+
 (1) convert gff3 to gtf with gff3_to_gtf.pl
 ```
 #!/usr/bin/perl
