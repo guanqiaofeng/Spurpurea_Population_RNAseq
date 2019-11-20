@@ -99,7 +99,8 @@ $ head test_juncfiles00.txt
 
 ## Step2. Identify intron clustering (working directory /Junc)
 code used (provided by LeafCutter): clustering/leafcutter_cluster.py
-submit job with qsub2.sh
+
+1. submit job with qsub2.sh
 ```
 #!/bin/sh
 #$ -V
@@ -218,7 +219,8 @@ chrChr01:10069:10164:clu_17251_NA	0.352107466392657	0.984442430712997	0.99224585
 
 ## Step4. Ploting significant differential splicing (working directory /Plotting)
 code used (provided by LeafCutter): scripts/ds_plots.R
-submit job with qsub4.sh
+
+1. submit job with qsub4.sh
 ```
 #!/bin/sh
 #$ -V
