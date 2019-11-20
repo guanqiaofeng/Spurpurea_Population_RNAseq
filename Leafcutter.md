@@ -235,3 +235,107 @@ code used (provided by LeafCutter): scripts/ds_plots.R
 # -f 0.05: FDR of 5%
 ```
 
+## Step5. Visualization
+
+1. prepare annotation files (working directory /lustre/scratch/gufeng/genome/Spur/187Zspecific/leafcutter_bed/new/)
+(1) convert gff3 to gtf with gff3_to_gtf.pl
+```
+#!/usr/bin/perl
+
+open FH, "<Spurpurea_519_v5.1.gene_exons_187Zspecific.gff3";
+open OUT, ">Spurpurea_187Zspecific.gtf";
+
+$n = 0;
+
+while (<FH>)
+{
+    $seq = $_;
+    chomp $seq;
+    $n = $n + 1; 
+    if ($n == 1)
+    {
+	print OUT "##gtf\n";
+    }
+    elsif ($n < 4)
+    {
+	print OUT "$seq\n";
+    }
+    elsif (/^(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+ID=(Sapur\.[^\.]+)(\.*\d*)\.v/)
+    {
+	$one = $1;
+	$two = $2;
+	$three = $3;
+	$four = $4;
+	$five = $5;
+	$six = $6;
+	$seven = $7;
+	$eight = $8;
+	$nine = $9;
+	$ten = $10;
+	if ($three eq "gene")
+	{
+	    print OUT "$one\t$two\t$three\t$four\t$five\t$six\t$seven\t$eight\tgene_id \"$nine\";\n";
+	}
+	elsif ($three eq "mRNA")
+	{
+	    print OUT "$one\t$two\ttranscript\t$four\t$five\t$six\t$seven\t$eight\tgene_id \"$nine\"; transcript_id \"$nine$ten\";\n";
+	}
+	else
+	{
+	    print OUT "$one\t$two\t$three\t$four\t$five\t$six\t$seven\t$eight\tgene_id \"$nine\"; transcript_id \"$nine$ten\";\n";
+	}
+    }
+}
+close FH;
+close OUT;
+```
+
+``` 
+$ perl gff3_to_gtf.pl
+```
+
+(2) convert gtf to annotation files with leafviz/gtf2leafcutter.pl (provided by LeafCutter)
+```
+/home/gufeng/leafcutter/leafviz/gtf2leafcutter.pl -o Spurpurea_187Zspecific Spurpurea_187Zspecific.gtf 
+```
+
+Output files:
+``` 
+ls -lrth *.gz
+-rw-r--r-- 1 gufeng bio 3.2M Sep 26 17:12 Spurpurea_187Zspecific_all_exons.txt.gz
+-rw-r--r-- 1 gufeng bio 2.6M Sep 26 17:12 Spurpurea_187Zspecific_all_introns.bed.gz
+-rw-r--r-- 1 gufeng bio 2.4M Sep 26 17:13 Spurpurea_187Zspecific_fiveprime.bed.gz
+-rw-r--r-- 1 gufeng bio 2.4M Sep 26 17:13 Spurpurea_187Zspecific_threeprime.bed.gz
+```
+
+2. Generate visualization results (working directory /Visualization)
+code used (provided by LeafCutter): leafviz/prepare_results.R
+
+(1) submit job with qsub5.sh
+```
+#!/bin/sh
+#$ -V
+#$ -cwd
+#$ -S /bin/bash
+#$ -N Visualization
+#$ -q omni
+#$ -pe sm 2
+#$ -P quanah
+
+/home/gufeng/leafcutter/leafviz/prepare_results.R --meta_data_file=groups_file.txt /lustre/scratch/gufeng/S_purpurea_RNA_seq/Junc/SP_perind_numers.counts.gz /lustre/scratch/gufeng/S_purpurea_RNA_seq/Diff_splicing/leafcutter_ds_cluster_significance.txt /lustre/scratch/gufeng/S_purpurea_RNA_seq/Diff_splicing/leafcutter_ds_effect_sizes.txt /lustre/scratch/gufeng/genome/Spur/187Zspecific/leafcutter_bed/new/Spurpurea_187Zspecific
+```
+
+Output file leafviz.RData
+
+3. Visualization (working directory local /Users/gfeng/Documents/project/Cornell/leafcutter/visualization)
+copy "leafviz.RData" into this local directory
+copy dependency files in leafviz/* into local directory
+code used (provided by LeafCutter): leafviz/run_leafviz.R
+
+```
+./run_leafviz.R leafviz.Rdata
+```
+
+data will be shown in browser
+
+DONE
